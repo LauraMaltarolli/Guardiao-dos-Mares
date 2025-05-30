@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardião dos Mares</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container">
+        <div class="logo">
+            🌊 <span>Guardião dos Mares</span>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="{% url 'index' %}">Início</a></li>
+                <li><a href="{% url 'mapa' %}">Mapas</a></li>
+                <li><a href="{% url 'tubarao' %}">Tubarões</a></li>
+                <li><a href="{% url 'campanha' %}">Campanhas</a></li>
+                <li><a href="{% url 'denuncia' %}">Denúncias</a></li>
+                <li><a href="{% url 'evento' %}">Eventos</a></li>
+                <li><a href="{% url 'perfil' %}">Perfil</a></li>
+                <li><a href="{% url 'logout' %}">Sair</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="section">
+        <h2>📢 Campanhas Ativas</h2>
+        <div class="grid">
+            {% for campanha in campanhas_ativas %}
+                <div class="card">
+                    <h3>{{ campanha.titulo }}</h3>
+                    <p>{{ campanha.descricao|truncatechars:100 }}</p>
+                    <p class="muted">De {{ campanha.data_inicio }} até {{ campanha.data_fim }}</p>
+                    <p class="bold">Organização: {{ campanha.organizacao.nome_fantasia }}</p>
+                </div>
+            {% empty %}
+                <p>Nenhuma campanha ativa no momento.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>🦈 Tubarões Ameaçados</h2>
+        <div class="grid">
+            {% for tubarao in tubaroes_ameacados %}
+                <div class="card">
+                    <img src="{{ tubarao.imagem.url }}" alt="{{ tubarao.nome_comum }}">
+                    <h3>{{ tubarao.nome_comum }}</h3>
+                    <p><i>{{ tubarao.nome_cientifico }}</i></p>
+                    <span class="badge danger">{{ tubarao.nivel_ameaca }}</span>
+                </div>
+            {% empty %}
+                <p>Nenhum tubarão ameaçado cadastrado.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>🚩 Denúncias Recentes</h2>
+        <div class="grid">
+            {% for denuncia in denuncias_recentes %}
+                <div class="card">
+                    <img src="{{ denuncia.imagem.url }}" alt="Imagem da denúncia">
+                    <h3>Local: {{ denuncia.local }}</h3>
+                    <p>{{ denuncia.descricao|truncatechars:100 }}</p>
+                    <p class="muted">Data: {{ denuncia.data }}</p>
+                </div>
+            {% empty %}
+                <p>Nenhuma denúncia recente.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>📅 Próximos Eventos</h2>
+        <div class="grid">
+            {% for evento in proximos_eventos %}
+                <div class="card">
+                    <h3>{{ evento.titulo }}</h3>
+                    <p>{{ evento.descricao|truncatechars:100 }}</p>
+                    <p class="bold">Local: {{ evento.local }}</p>
+                    <p class="muted">Data: {{ evento.data }}</p>
+                </div>
+            {% empty %}
+                <p>Nenhum evento futuro cadastrado.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+</main>
+
+<footer class="footer">
+    <p>© 2025 Guardião dos Mares. Todos os direitos reservados.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,307 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Cores */
+:root {
+    --azul-marinho: #00334e;
+    --azul-claro: #0096c7;
+    --branco: #fdfdfd;
+    --cinza: #555;
+    --vermelho: #d90429;
+}
+
+/* INDEX */
+/* Navbar */
+.navbar {
+    background-color: var(--azul-marinho);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.navbar .container {
+    max-width: 2000px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar .logo {
+    font-size: 1.5rem;
+    color: var(--branco);
+    font-weight: bold;
+}
+
+.navbar .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+}
+
+.navbar .nav-links li a {
+    color: var(--branco);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.navbar .nav-links li a:hover {
+    color: var(--azul-claro);
+}
+
+/* Layout */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f7fa;
+    color: var(--cinza);
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px 20px;
+}
+
+/* Seções */
+.section {
+    margin-bottom: 60px;
+}
+
+.section h2 {
+    border-left: 6px solid var(--azul-claro);
+    padding-left: 15px;
+    margin-bottom: 25px;
+    color: var(--azul-marinho);
+}
+
+/* Cards e Grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background-color: var(--branco);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.card h3 {
+    color: var(--azul-marinho);
+    margin-bottom: 10px;
+}
+
+.card p {
+    margin-bottom: 8px;
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    color: var(--branco);
+}
+
+.badge.danger {
+    background-color: var(--vermelho);
+}
+
+/* Textos utilitários */
+.muted {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--azul-marinho);
+    color: var(--branco);
+    text-align: center;
+    padding: 15px 0;
+    margin-top: 50px;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
+/* Página de Login/Cadastro */
+body.login-page {
+    background-image: url('/static/img/background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+a{
+    color: var(--azul-claro);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+form p {
+    color: var(--cinza);
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 30%;
+    padding: 20px;
+}
+
+.login-container-cadastro {
+    width: 100%;
+    max-width: 60%;
+    padding: 20px;
+}
+
+.login-card {
+    background-color: var(--branco);
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+.login-card h1 {
+    color: var(--azul-marinho);
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.login-card h2 {
+    color: var(--azul-marinho);
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+}
+
+.login-card > p {
+    color: var(--cinza);
+    margin-bottom: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--azul-marinho);
+    font-weight: 600;
+}
+
+.input-group input {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    border-color: var(--azul-claro);
+    outline: none;
+}
+
+/* Botão */
+.btn {
+    width: 100%;
+    background-color: var(--azul-marinho);
+    color: var(--branco);
+    padding: 12px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: var(--azul-claro);
+}
+
+/* Mensagens de erro */
+.messages {
+    margin-bottom: 15px;
+}
+
+.message {
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.message.error {
+    background-color: #ffe0e0;
+    color: #b20000;
+}
+
+.message.success {
+    background-color: #d4f8d4;
+    color: #267a26;
+}
+
+.dynamic-fields {
+    margin-bottom: 15px;
+}
+
+fieldset {
+    width: 100%;
+    border: 0px solid #ccc;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+#form-cadastro > .conteudo {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+legend {
+    color: var(--azul-marinho);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+
+

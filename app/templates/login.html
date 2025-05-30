@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Guardião dos Mares</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body class="login-page">
+
+    <div class="login-container">
+        <div class="login-card">
+            <h1>🌊 Guardião dos Mares</h1>
+            <h2>Bem-vindo de volta!</h2>
+            <p>Faça login para proteger nossos oceanos.</p>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <p class="message {{ message.tags }}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="input-group">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" name="username" required placeholder="Digite seu Usuário">
+                </div>
+                <div class="input-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required placeholder="Digite sua senha">
+                </div>
+                <button type="submit" class="btn">Entrar</button>
+                <p>Não tem uma conta? <a href="{% url 'cadastro' %}">Cadastre-se</a></p>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

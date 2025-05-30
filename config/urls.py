@@ -22,4 +22,18 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', LoginView.as_view(), name='login'),
+    path('index/', IndexView.as_view(), name='index'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('cadastro/', CadastroView.as_view(), name='cadastro'),
+    path('perfil/', PerfilView.as_view(), name='perfil'),
+    path('mapas/', MapaView.as_view(), name='mapa'),
+    path('mapa/<int:mapa_id>/', DetalheMapaView.as_view(), name='detalhe_mapa'),
+    path('campanhas/', CampanhaView.as_view(), name='campanha'),
+    path('eventos/', EventoView.as_view(), name='evento'),
+    path('tubaroes/', TubaraoView.as_view(), name='tubarao'),
+    path('denuncias/', DenunciaView.as_view(), name='denuncia'),
+    path('comentarios/', ComentarioView.as_view(), name='comentario'),
+    path('feedbacks/', FeedbackView.as_view(), name='feedback'),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
