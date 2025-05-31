@@ -1,0 +1,358 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Interativo: Ataques de Tubarão no Brasil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA;
+            color: #343A40;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 500px;
+            }
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            color: #6C757D;
+            line-height: 1;
+        }
+
+        @media (min-width: 768px) {
+            .md\:p-6 {
+                padding: 1.5rem;
+                padding-bottom: 60px;
+            }
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="navbar">
+    <div class="container">
+        <div class="logo">
+            🌊 <span>Guardião dos Mares</span>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="{% url 'index' %}">Início</a></li>
+                <li><a href="{% url 'ataque' %}">Ataques</a></li>
+                <li><a href="{% url 'tubarao' %}">Tubarões</a></li>
+                <li><a href="{% url 'campanha' %}">Campanhas</a></li>
+                <li><a href="{% url 'denuncia' %}">Denúncias</a></li>
+                <li><a href="{% url 'evento' %}">Eventos</a></li>
+                <li><a href="{% url 'perfil' %}">Perfil</a></li>
+                <li><a href="{% url 'logout' %}">Sair</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="national-overview" class="mb-12">
+            <h2 class="text-2xl font-bold text-center mb-2 text-sky-800">Panorama Nacional</h2>
+            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-6">
+                O Brasil figura entre os países com registros de ataques de tubarão, mas a incidência é extremamente concentrada. O gráfico abaixo ilustra a distribuição de todos os ataques não provocados confirmados desde 1931, revelando um epicentro claro e outras áreas com ocorrências esporádicas.
+            </p>
+            <div class="bg-white rounded-lg shadow-lg p-4 md:p-6">
+                <h3 class="text-xl font-semibold text-center mb-4">Ataques por Estado (1931-Presente)</h3>
+                <div class="chart-container mx-auto" style="height: 450px; max-height: 60vh;">
+                    <canvas id="attacksByStateChart"></canvas>
+                </div>
+                 <p class="text-xs text-center text-gray-500 mt-4">Fonte: International Shark Attack File (ISAF)</p>
+            </div>
+        </section>
+
+        <section id="pernambuco-focus" class="mb-12 bg-sky-50 rounded-xl p-4 md:p-8">
+            <h2 class="text-2xl font-bold text-center mb-4 text-sky-900">Pernambuco: O Epicentro dos Incidentes</h2>
+            <p class="text-center text-gray-700 max-w-4xl mx-auto mb-8">
+                Pernambuco não é apenas o líder em número de ataques no Brasil; a região metropolitana do Recife é o local com a maior incidência da América do Sul. Essa realidade é fruto de uma complexa interação entre a geografia costeira e, crucialmente, profundas alterações ambientais causadas pelo homem.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-sky-800">Causas da Alta Incidência</h3>
+                    <p class="mb-4 text-gray-600">A construção do Complexo Portuário de Suape nos anos 80 é apontada como o principal catalisador, desencadeando uma série de desequilíbrios ecológicos:</p>
+                    <div class="space-y-4">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="p-4 bg-red-100 rounded-lg w-full">
+                                <h4 class="font-bold text-red-800">1. Degradação de Habitat</h4>
+                                <p class="text-sm text-red-700">Aterramento de mangues e destruição de recifes eliminaram berçários naturais de presas dos tubarões.</p>
+                            </div>
+                            <div class="flow-arrow my-2 transform rotate-90">➔</div>
+                            <div class="p-4 bg-yellow-100 rounded-lg w-full">
+                                <h4 class="font-bold text-yellow-800">2. Alteração de Rotas</h4>
+                                <p class="text-sm text-yellow-700">A supressão dos mangues forçou a migração de tubarões-touro para estuários urbanos, e o tráfego de navios atraiu tubarões-tigre para a costa.</p>
+                            </div>
+                             <div class="flow-arrow my-2 transform rotate-90">➔</div>
+                             <div class="p-4 bg-orange-100 rounded-lg w-full">
+                                <h4 class="font-bold text-orange-800">3. Escassez de Alimento e Atrativos</h4>
+                                <p class="text-sm text-orange-700">Descarte de resíduos de matadouros e da pesca de arrasto criaram fontes de alimento artificiais perto de áreas populosas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-sky-800">Localidades de Maior Risco em PE</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-2xl mr-3">📍</span>
+                            <div>
+                                <h4 class="font-bold">Praia de Boa Viagem, Recife</h4>
+                                <p class="text-gray-600 text-sm">A mais perigosa e frequentada, com dezenas de ataques e mortes. A área da "Igrejinha" é um ponto crítico.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-2xl mr-3">📍</span>
+                            <div>
+                                <h4 class="font-bold">Praia de Piedade, Jaboatão dos Guararapes</h4>
+                                <p class="text-gray-600 text-sm">Local de múltiplos ataques, incluindo incidentes recentes. Possui um trecho de 2.2 km interditado para banho.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                             <span class="text-2xl mr-3">📍</span>
+                            <div>
+                                <h4 class="font-bold">Ilha de Fernando de Noronha</h4>
+                                <p class="text-gray-600 text-sm">A Baía do Sueste é desaconselhável para mergulho devido à alta atividade de tubarões.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-2xl mr-3">📍</span>
+                            <div>
+                                <h4 class="font-bold">Outras Áreas</h4>
+                                <p class="text-gray-600 text-sm">Praias de Cabo de Santo Agostinho, Enseada dos Corais e Pau Amarelo também possuem histórico de incidentes.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="attack-patterns" class="mb-12">
+            <h2 class="text-2xl font-bold text-center mb-2 text-sky-800">Entendendo os Padrões</h2>
+            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-6">
+                Os dados revelam padrões sobre quando e quem é mais afetado pelos ataques. Essas tendências estão mais ligadas à presença humana na água do que a um comportamento específico dos tubarões. Explore os dados abaixo.
+            </p>
+             <div class="bg-white rounded-lg shadow-lg p-4 md:p-6" style="padding-bottom: 60px;">
+                <div class="flex justify-center space-x-2 mb-4">
+                    <button id="btnDay" class="bg-sky-800 text-white px-4 py-2 rounded-md shadow-sm transition-transform transform hover:scale-105">Por Dia da Semana</button>
+                    <button id="btnVictim" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md shadow-sm transition-transform transform hover:scale-105">Por Perfil da Vítima</button>
+                </div>
+                
+                <div id="day-charts">
+                    <div class="chart-container mx-auto" style="height: 350px;">
+                        <canvas id="attacksByDayChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="victim-charts" class="hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="chart-container mx-auto" style="height: 300px;">
+                             <h3 class="text-lg font-semibold text-center mb-2">Por Gênero</h3>
+                            <canvas id="attacksByGenderChart"></canvas>
+                        </div>
+                        <div class="chart-container mx-auto" style="height: 300px;">
+                             <h3 class="text-lg font-semibold text-center mb-2">Por Faixa Etária</h3>
+                            <canvas id="attacksByAgeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="safety" class="bg-green-50 rounded-xl p-4 md:p-8">
+             <h2 class="text-2xl font-bold text-center mb-4 text-green-900">Prevenção e Segurança</h2>
+              <p class="text-center text-gray-700 max-w-3xl mx-auto mb-8">
+                A coexistência segura depende da responsabilidade compartilhada. Autoridades implementam medidas, mas o comportamento individual é a chave para a prevenção. Siga as recomendações para minimizar os riscos.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                     <h3 class="text-xl font-semibold mb-4 text-green-800">Recomendações para Banhistas</h3>
+                     <ul class="space-y-4">
+                        <li class="flex items-start"><span class="text-2xl mr-3">⚠️</span><div><span class="font-bold">Respeite a Sinalização:</span> Placas e interdições existem por um motivo. Obedeça sempre.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3">🌊</span><div><span class="font-bold">Evite Águas de Risco:</span> Não nade em águas turvas, foz de rios ou canais profundos.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3">⌚</span><div><span class="font-bold">Atenção ao Horário:</span> Evite o amanhecer e entardecer, períodos de maior atividade dos tubarões.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3">👤</span><div><span class="font-bold">Não Nade Sozinho:</span> A presença de mais pessoas pode inibir a aproximação.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3">💎</span><div><span class="font-bold">Evite Objetos Brilhantes:</span> Joias podem ser confundidas com escamas de peixe.</div></li>
+                     </ul>
+                </div>
+                 <div class="bg-white rounded-lg shadow-md p-6">
+                     <h3 class="text-xl font-semibold mb-4 text-green-800">Ações das Autoridades</h3>
+                     <ul class="space-y-4">
+                        <li class="flex items-start"><span class="text-2xl mr-3">팻</span><div><span class="font-bold">Sinalização e Monitoramento:</span> Instalação de placas de alerta e vigilância por câmeras em áreas críticas.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3">⛔</span><div><span class="font-bold">Interdição de Áreas:</span> Proibição permanente do banho em trechos de altíssimo risco, como em Piedade.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3">🎓</span><div><span class="font-bold">Educação Ambiental:</span> Campanhas para conscientizar a população sobre os riscos e a importância ecológica dos tubarões.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3">🔬</span><div><span class="font-bold">Pesquisa e Manejo:</span> Programas como o PROTUBA (embora intermitente) para mapear e entender o comportamento dos animais.</div></li>
+                     </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 Guardião dos Mares. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const commonTooltipCallback = {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                  return label.join(' ');
+                                } else {
+                                  return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            const attacksByStateData = {
+                labels: ['Pernambuco', 'São Paulo', 'Maranhão', 'Rio de Janeiro', 'Rio Grande do Sul', 'Bahia', 'Rio Grande do Norte', 'Santa Catarina', 'Paraná', 'Ceará'],
+                datasets: [{
+                    label: 'Total de Ataques',
+                    data: [65, 11, 10, 7, 5, 5, 4, 2, 1, 1],
+                    backgroundColor: 'rgba(2, 132, 199, 0.7)',
+                    borderColor: 'rgba(2, 132, 199, 1)',
+                    borderWidth: 1
+                }]
+            };
+
+            const attacksByDayData = {
+                labels: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+                datasets: [{
+                    label: '% de Ataques',
+                    data: [25.6, 10.5, 11.6, 9.3, 10.5, 12.8, 19.8],
+                    backgroundColor: 'rgba(2, 132, 199, 0.7)',
+                    borderColor: 'rgba(2, 132, 199, 1)',
+                    borderWidth: 1
+                }]
+            };
+
+            const attacksByGenderData = {
+                labels: ['Masculino', 'Feminino'],
+                datasets: [{
+                    label: '% de Ataques',
+                    data: [89.5, 10.5],
+                    backgroundColor: ['rgba(2, 132, 199, 0.7)', 'rgba(245, 166, 35, 0.7)'],
+                    borderColor: ['rgba(2, 132, 199, 1)', 'rgba(245, 166, 35, 1)'],
+                    borderWidth: 1
+                }]
+            };
+
+            const attacksByAgeData = {
+                 labels: ['0-11', '12-19', '20-30', '31-40', '41-50', '51+'],
+                datasets: [{
+                    label: 'Vítimas',
+                    data: [5, 21, 19, 10, 8, 5],
+                    backgroundColor: 'rgba(2, 132, 199, 0.7)',
+                    borderColor: 'rgba(2, 132, 199, 1)',
+                    borderWidth: 1
+                }]
+            };
+
+            const createChart = (ctx, type, data, options) => {
+                new Chart(ctx, { type, data, options });
+            };
+
+            const ctxState = document.getElementById('attacksByStateChart').getContext('2d');
+            createChart(ctxState, 'bar', attacksByStateData, {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: commonTooltipCallback.plugins,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Número de Ataques Confirmados' }
+                    }
+                }
+            });
+
+            const ctxDay = document.getElementById('attacksByDayChart').getContext('2d');
+            createChart(ctxDay, 'bar', attacksByDayData, {
+                responsive: true,
+                maintainAspectRatio: false,
+                 plugins: commonTooltipCallback.plugins,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Percentual de Ocorrências (%)' }
+                    }
+                }
+            });
+
+            const ctxGender = document.getElementById('attacksByGenderChart').getContext('2d');
+            createChart(ctxGender, 'doughnut', attacksByGenderData, {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: commonTooltipCallback.plugins
+            });
+
+            const ctxAge = document.getElementById('attacksByAgeChart').getContext('2d');
+            createChart(ctxAge, 'bar', attacksByAgeData, {
+                responsive: true,
+                maintainAspectRatio: false,
+                 plugins: commonTooltipCallback.plugins,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Número de Vítimas' }
+                    }
+                }
+            });
+            
+            const btnDay = document.getElementById('btnDay');
+            const btnVictim = document.getElementById('btnVictim');
+            const dayCharts = document.getElementById('day-charts');
+            const victimCharts = document.getElementById('victim-charts');
+            
+            btnDay.addEventListener('click', () => {
+                dayCharts.classList.remove('hidden');
+                victimCharts.classList.add('hidden');
+                btnDay.classList.replace('bg-gray-200', 'bg-sky-800');
+                btnDay.classList.replace('text-gray-700', 'text-white');
+                btnVictim.classList.replace('bg-sky-800', 'bg-gray-200');
+                btnVictim.classList.replace('text-white', 'text-gray-700');
+            });
+            
+            btnVictim.addEventListener('click', () => {
+                dayCharts.classList.add('hidden');
+                victimCharts.classList.remove('hidden');
+                btnVictim.classList.replace('bg-gray-200', 'bg-sky-800');
+                btnVictim.classList.replace('text-gray-700', 'text-white');
+                btnDay.classList.replace('bg-sky-800', 'bg-gray-200');
+                btnDay.classList.replace('text-white', 'text-gray-700');
+            });
+        });
+    </script>
+</body>
+</html>

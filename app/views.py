@@ -159,7 +159,7 @@ class CadastroView(View):
             return redirect('cadastro')
 
         messages.success(request, 'Cadastro realizado com sucesso!')
-        return redirect('index')
+        return redirect('index.html')
 
 
 
@@ -211,29 +211,6 @@ class PerfilView(LoginRequiredMixin, View):
     def post(self, request):
         pass
 
-
-# Mapa
-class MapaView(LoginRequiredMixin, View):
-    login_url = 'login'
-
-    def get(self, request, *args, **kwargs):
-        mapas = Mapa.objects.all()
-        return render(request, 'mapa.html', {'mapas': mapas})
-
-    def post(self, request):
-        pass
-
-# Detalhe do Mapa
-class DetalheMapaView(LoginRequiredMixin, View):
-    login_url = 'login'
-
-    def get(self, request, mapa_id, *args, **kwargs):
-        mapa = get_object_or_404(Mapa, id=mapa_id)
-        return render(request, 'detalhe_mapa.html', {'mapa': mapa})
-
-    def post(self, request):
-        pass
-
 # Campanha
 class CampanhaView(LoginRequiredMixin, View):
     login_url = 'login'
@@ -245,6 +222,15 @@ class CampanhaView(LoginRequiredMixin, View):
     def post(self, request):
         pass
 
+# Ataques
+class AtaquesView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, 'ataque.html')
+
+    def post(self, request):
+        pass
 
 # Evento
 class EventoView(LoginRequiredMixin, View):

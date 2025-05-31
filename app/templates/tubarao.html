@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Interativo de Tubarões</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA;
+            color: #343A40;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                🌊 <span>Guardião dos Mares</span>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{% url 'index' %}">Início</a></li>
+                    <li><a href="{% url 'ataque' %}">Ataques</a></li>
+                    <li><a href="{% url 'tubarao' %}">Tubarões</a></li>
+                    <li><a href="{% url 'campanha' %}">Campanhas</a></li>
+                    <li><a href="{% url 'denuncia' %}">Denúncias</a></li>
+                    <li><a href="{% url 'evento' %}">Eventos</a></li>
+                    <li><a href="{% url 'perfil' %}">Perfil</a></li>
+                    <li><a href="{% url 'logout' %}">Sair</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="introduction" class="mb-12 text-center max-w-3xl mx-auto">
+            <h2 class="text-2xl font-bold mb-4 text-sky-800">Conheça Nossos Tubarões</h2>
+            <p class="text-gray-600 mb-6">
+                Este catálogo apresenta informações detalhadas sobre diversas espécies de tubarões, incluindo seus nomes comuns e científicos, níveis de ameaça, descrições e curiosidades.
+            </p>
+        </section>
+
+        <section id="filter-section" class="mb-8 bg-white rounded-lg shadow-md p-4 md:p-6">
+            <h3 class="text-xl font-semibold text-center mb-4 text-sky-800">Filtrar por Nível de Ameaça</h3>
+            <div class="flex flex-wrap justify-center gap-3">
+                <button class="filter-btn bg-sky-800 text-white px-5 py-2 rounded-md shadow-sm transition-transform transform hover:scale-105" data-filter="Todos">Todos</button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-5 py-2 rounded-md shadow-sm transition-transform transform hover:scale-105" data-filter="Extinta">Extinta</button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-5 py-2 rounded-md shadow-sm transition-transform transform hover:scale-105" data-filter="Criticamente Ameaçada">Criticamente Ameaçada</button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-5 py-2 rounded-md shadow-sm transition-transform transform hover:scale-105" data-filter="Ameaçada">Ameaçada</button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-5 py-2 rounded-md shadow-sm transition-transform transform hover:scale-105" data-filter="Vulnerável">Vulnerável</button>
+                <button class="filter-btn bg-gray-200 text-gray-700 px-5 py-2 rounded-md shadow-sm transition-transform transform hover:scale-105" data-filter="Pouco Preocupante">Pouco Preocupante</button>
+            </div>
+        </section>
+
+        <section id="shark-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for tubarao in tubaroes %}
+                <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center shark-card" data-nivel-ameaca="{{ tubarao.nivel_ameaca }}">
+                    <img src="{{ tubarao.imagem.url }}" alt="{{ tubarao.nome_comum }}" class="w-full h-48 object-cover rounded-md mb-4">
+                    <h3 class="text-xl font-bold text-sky-900 mb-2">{{ tubarao.nome_comum }}</h3>
+                    <p class="text-gray-700 italic mb-2">{{ tubarao.nome_cientifico }}</p>
+                    <p class="text-sm font-semibold text-amber-600 mb-3">Nível de Ameaça: {{ tubarao.get_nivel_ameaca_display }}</p>
+                    <p class="text-gray-600 text-sm mb-4">{{ tubarao.descricao }}</p>
+                    <div class="text-gray-500 text-xs text-left w-full">
+                        <span class="font-bold">Curiosidade:</span> {{ tubarao.curiosidade }}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center text-gray-500 col-span-full">Nenhum tubarão encontrado no banco de dados.</p>
+            {% endfor %}
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 Guardião dos Mares. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const sharkCards = document.querySelectorAll('.shark-card');
+
+            const filterSharks = (filter) => {
+                sharkCards.forEach(card => {
+                    const nivelAmeaca = card.dataset.nivelAmeaca;
+                    if (filter === 'Todos' || nivelAmeaca === filter) {
+                        card.style.display = 'flex'; // Mostra o cartão
+                    } else {
+                        card.style.display = 'none'; // Esconde o cartão
+                    }
+                });
+            };
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    filterButtons.forEach(btn => {
+                        btn.classList.replace('bg-sky-800', 'bg-gray-200');
+                        btn.classList.replace('text-white', 'text-gray-700');
+                    });
+                    event.target.classList.replace('bg-gray-200', 'bg-sky-800');
+                    event.target.classList.replace('text-gray-700', 'text-white');
+                    filterSharks(event.target.dataset.filter);
+                });
+            });
+
+            // Garante que o filtro "Todos" esteja ativo na carga inicial
+            filterSharks('Todos');
+        });
+    </script>
+</body>
+</html>

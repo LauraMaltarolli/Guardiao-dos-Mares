@@ -119,28 +119,7 @@ class Evento(models.Model):
     class Meta:
         verbose_name = "Evento"
         verbose_name_plural = "Eventos"
-
-# ManyToMany do Django cria sozinha uma tabela intermediária para relacionar os modelos,
-# então não precisamos definir uma tabela intermediária manualmente para o relacionamento entre Evento e Usuario.
-class Mapa(models.Model):
-    local = models.CharField(max_length=100)
-    tubarao = models.ForeignKey(Tubarao, on_delete=models.CASCADE)
-    denuncias = models.ManyToManyField(Denuncia, blank=True)
-    imagem = models.ImageField(upload_to='mapas/')
-    PERIGO_CHOICES = [
-        ('Baixo', 'Baixo'),
-        ('Moderado', 'Moderado'),
-        ('Alto', 'Alto'),
-    ]
-    perigo = models.CharField(max_length=10, choices=PERIGO_CHOICES)
-
-    def __str__(self):
-        return self.local
-
-    class Meta:
-        verbose_name = "Mapa"
-        verbose_name_plural = "Mapas"
-
+        
 
 class Comentario(models.Model):
     texto = models.TextField()
