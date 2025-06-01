@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Usuário</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA;
+            color: #343A40;
+        }
+        .profile-card {
+            background-color: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
+            padding: 1.5rem;
+        }
+        .section-title {
+            color: #1D4ED8; /* Cor azulada para títulos de seção */
+            margin-bottom: 0.75rem;
+        }
+        .data-item {
+            margin-bottom: 0.5rem;
+        }
+        .data-label {
+            font-weight: bold;
+            color: #4A5568; /* Cor cinza mais escura para rótulos */
+        }
+        .data-value {
+            color: #2D3748; /* Cor preta mais suave para valores */
+        }
+        .list-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .list-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                🌊 <span>Guardião dos Mares</span>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{% url 'index' %}">Início</a></li>
+                    <li><a href="{% url 'ataque' %}">Ataques</a></li>
+                    <li><a href="{% url 'tubarao' %}">Tubarões</a></li>
+                    <li><a href="{% url 'campanha' %}">Campanhas</a></li>
+                    <li><a href="{% url 'denuncia' %}">Denúncias</a></li>
+                    <li><a href="{% url 'evento' %}">Eventos</a></li>
+                    <li><a href="{% url 'perfil' %}">Perfil</a></li>
+                    <li><a href="{% url 'logout' %}">Sair</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        <div class="profile-card">
+            <h2 class="text-2xl font-semibold mb-4 text-sky-800">Informações da Conta</h2>
+            <div class="data-item">
+                <span class="data-label">Nome de Usuário:</span>
+                <span class="data-value">{{ usuario.username }}</span>
+            </div>
+            <div class="data-item">
+                <span class="data-label">Email:</span>
+                <span class="data-value">{{ usuario.email }}</span>
+            </div>
+            {% if usuario.cidade %}
+                <div class="data-item">
+                    <span class="data-label">Cidade:</span>
+                    <span class="data-value">{{ usuario.cidade.nome }} - {{ usuario.cidade.uf }}</span>
+                </div>
+            {% endif %}
+
+            <hr class="my-6 border-t border-gray-300">
+
+            <h2 class="text-2xl font-semibold mb-4 text-sky-800">Detalhes do Perfil</h2>
+
+            <div class="data-item">
+                <span class="data-label">Tipo de Usuário:</span>
+                <span class="data-value">{{ tipo_usuario }}</span>
+            </div>
+
+            {% if tipo_usuario == 'Cidadão' and dados_especificos %}
+                <div class="data-item">
+                    <span class="data-label">Telefone:</span>
+                    <span class="data-value">{{ dados_especificos.telefone }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">CPF:</span>
+                    <span class="data-value">{{ dados_especificos.cpf }}</span>
+                </div>
+
+            {% elif tipo_usuario == 'Organização' and dados_especificos %}
+                <div class="data-item">
+                    <span class="data-label">Nome Fantasia:</span>
+                    <span class="data-value">{{ dados_especificos.nome_fantasia }}</span>
+                </div>
+                {% if dados_especificos.site %}
+                    <div class="data-item">
+                        <span class="data-label">Website:</span>
+                        <span class="data-value"><a href="{{ dados_especificos.site }}" target="_blank" class="text-blue-500 hover:underline">{{ dados_especificos.site }}</a></span>
+                    </div>
+                {% endif %}
+                <div class="data-item">
+                    <span class="data-label">Contato:</span>
+                    <span class="data-value">{{ dados_especificos.contato }}</span>
+                </div>
+
+                {% if campanhas %}
+                    <h3 class="section-title mt-6 text-lg font-semibold">Campanhas Criadas</h3>
+                    <ul>
+                        {% for campanha in campanhas %}
+                            <li class="list-item">{{ campanha.titulo }}</li>
+                        {% empty %}
+                            <li>Nenhuma campanha criada ainda.</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+            {% elif tipo_usuario == 'Pesquisador' and dados_especificos %}
+                <div class="data-item">
+                    <span class="data-label">Instituição:</span>
+                    <span class="data-value">{{ dados_especificos.instituicao }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Área de Atuação:</span>
+                    <span class="data-value">{{ dados_especificos.area_atuacao }}</span>
+                </div>
+            {% endif %}
+
+            <h2 class="text-2xl font-semibold mt-6 mb-4 text-sky-800">Suas Atividades</h2>
+
+            <h3 class="section-title text-lg font-semibold">Denúncias Enviadas</h3>
+            <ul>
+                {% for denuncia in denuncias %}
+                    <li class="list-item">{{ denuncia.titulo }} ({{ denuncia.data_criacao }})</li>
+                {% empty %}
+                    <li>Nenhuma denúncia enviada.</li>
+                {% endfor %}
+            </ul>
+
+            <h3 class="section-title mt-4 text-lg font-semibold">Eventos Participados</h3>
+            <ul>
+                {% for evento in eventos %}
+                    <li class="list-item">{{ evento.nome }} ({{ evento.data_inicio }})</li>
+                {% empty %}
+                    <li>Nenhum evento participado.</li>
+                {% endfor %}
+            </ul>
+
+            <h3 class="section-title mt-4 text-lg font-semibold">Comentários Feitos</h3>
+            <ul>
+                {% for comentario in comentarios %}
+                    <li class="list-item">{{ comentario.texto|truncatechars:50 }} ({{ comentario.data_criacao }})</li>
+                {% empty %}
+                    <li>Nenhum comentário feito.</li>
+                {% endfor %}
+            </ul>
+
+            <h3 class="section-title mt-4 text-lg font-semibold">Feedbacks Enviados</h3>
+            <ul>
+                {% for feedback in feedbacks %}
+                    <li class="list-item">{{ feedback.mensagem|truncatechars:50 }} ({{ feedback.data_criacao }})</li>
+                {% empty %}
+                    <li>Nenhum feedback enviado.</li>
+                {% endfor %}
+            </ul>
+
+            <div class="mt-6">
+                <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Sair</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 Guardião dos Mares. Todos os direitos reservados.</p>
+    </footer>
+
+</body>
+</html>

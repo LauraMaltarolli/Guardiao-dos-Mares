@@ -159,7 +159,7 @@ class CadastroView(View):
             return redirect('cadastro')
 
         messages.success(request, 'Cadastro realizado com sucesso!')
-        return redirect('index.html')
+        return redirect('index')
 
 
 
@@ -169,6 +169,8 @@ class PerfilView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         usuario = request.user
+
+        campanhas = None
 
         # Dados relacionados
         denuncias = Denuncia.objects.filter(usuario=usuario)
