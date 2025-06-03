@@ -134,21 +134,3 @@ class Comentario(models.Model):
         verbose_name = "Comentário"
         verbose_name_plural = "Comentários"
 
-
-class Feedback(models.Model):
-    TIPOS = (
-        ('Sugestão', 'Sugestão'),
-        ('Crítica', 'Crítica'),
-        ('Elogio', 'Elogio'),
-    )
-    texto = models.TextField()
-    data = models.DateField(auto_now_add=True)
-    tipo = models.CharField(max_length=20, choices=TIPOS)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.tipo} - {self.usuario.username}"
-
-    class Meta:
-        verbose_name = "Feedback"
-        verbose_name_plural = "Feedbacks"

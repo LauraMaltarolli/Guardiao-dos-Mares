@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Denúncias</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA;
+            color: #343A40;
+        }
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                🌊 <span>Guardião dos Mares</span>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{% url 'index' %}">Início</a></li>
+                    <li><a href="{% url 'ataque' %}">Ataques</a></li>
+                    <li><a href="{% url 'tubarao' %}">Tubarões</a></li>
+                    <li><a href="{% url 'campanha' %}">Campanhas</a></li>
+                    <li><a href="{% url 'denuncia' %}">Denúncias</a></li>
+                    <li><a href="{% url 'evento' %}">Eventos</a></li>
+                    <li><a href="{% url 'perfil' %}">Perfil</a></li>
+                    <li><a href="{% url 'logout' %}">Sair</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="introduction" class="mb-12 text-center max-w-3xl mx-auto">
+            <h2 class="text-2xl font-bold mb-4 text-red-600">Fique Informado</h2>
+            <p class="text-gray-600 mb-6">
+                Esta página lista as denúncias registradas por usuários da plataforma. Cada denúncia contém informações sobre o local, data e uma breve descrição do ocorrido.
+            </p>
+            <p class="text-red-500">(No futuro você poderá ver os detalhes de cada uma das denúncias)</p>
+        </section>
+
+        <section id="denuncia-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for denuncia in denuncias %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    {% if denuncia.imagem %}
+                        <img src="{{ denuncia.imagem.url }}" alt="Imagem da Denúncia em {{ denuncia.local }}" class="w-full h-48 object-cover">
+                    {% else %}
+                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                            <span class="text-gray-500">Sem Imagem</span>
+                        </div>
+                    {% endif %}
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-red-700 mb-2">{{ denuncia.local }}</h3>
+                        <p class="text-gray-600 text-sm mb-3">Data: {{ denuncia.data|date:"d/m/Y" }}</p>
+                        <p class="text-gray-700 text-sm mb-4">{{ denuncia.descricao|truncatechars:100 }}</p>
+                        <p class="text-gray-500 text-xs">Denunciado por: {{ denuncia.usuario.username }}</p>
+                        {# Você pode adicionar um link para detalhes da denúncia aqui #}
+                        {# <a href="{% url 'detalhe_denuncia' denuncia.id %}" class="inline-block mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md text-center transition-colors">Ver Detalhes</a> #}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center text-gray-500 col-span-full">Nenhuma denúncia registrada até o momento.</p>
+            {% endfor %}
+        </section>
+
+    </main>
+    <button id="open-denuncia-modal-btn-floating" class="floating-button bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-full shadow-lg transition-colors">
+        Denunciar
+    </button>
+
+    <div id="denuncia-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+            <button id="close-denuncia-modal-btn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            <h2 class="text-2xl font-bold mb-4 text-red-700 text-center">Registrar Nova Denúncia</h2>
+            {% if user.is_authenticated %}
+                <form id="denuncia-form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-4">
+                            <label for="{{ field.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <p class="text-red-500 text-xs italic">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                            {% if field.help_text %}
+                                <p class="text-gray-500 text-xs italic">{{ field.help_text }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Enviar Denúncia</button>
+                    <div id="denuncia-error-message" class="text-red-500 text-sm mt-2 hidden"></div>
+                    <div id="denuncia-success-message" class="text-green-500 text-sm mt-2 hidden">Denúncia enviada com sucesso!</div>
+                </form>
+            {% else %}
+                <p class="text-center text-gray-600 py-4">Você precisa estar <a href="{% url 'login' %}" class="text-blue-500 hover:underline">logado</a> para denunciar.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2025 Guardião dos Mares. Todos os direitos reservados.</p>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openDenunciaModalBtn = document.getElementById('open-denuncia-modal-btn');
+            const openDenunciaModalBtnFloating = document.getElementById('open-denuncia-modal-btn-floating');
+            const denunciaModal = document.getElementById('denuncia-modal');
+            const closeDenunciaModalBtn = document.getElementById('close-denuncia-modal-btn');
+            const denunciaForm = document.getElementById('denuncia-form');
+            const denunciaErrorMessage = document.getElementById('denuncia-error-message');
+            const denunciaSuccessMessage = document.getElementById('denuncia-success-message');
+
+            const openModalButtons = [openDenunciaModalBtn, openDenunciaModalBtnFloating].filter(Boolean);
+            openModalButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    denunciaModal.classList.remove('hidden');
+                });
+            });
+
+            closeDenunciaModalBtn.addEventListener('click', () => {
+                denunciaModal.classList.add('hidden');
+                if (denunciaForm) denunciaForm.reset();
+                if (denunciaErrorMessage) denunciaErrorMessage.classList.add('hidden');
+                if (denunciaSuccessMessage) denunciaSuccessMessage.classList.add('hidden');
+            });
+
+            denunciaModal.addEventListener('click', (event) => {
+                if (event.target === denunciaModal) {
+                    denunciaModal.classList.add('hidden');
+                    if (denunciaForm) denunciaForm.reset();
+                    if (denunciaErrorMessage) denunciaErrorMessage.classList.add('hidden');
+                    if (denunciaSuccessMessage) denunciaSuccessMessage.classList.add('hidden');
+                }
+            });
+
+            if (denunciaForm) {
+                denunciaForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(this);
+
+                    fetch('/denuncias/', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest' 
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            denunciaErrorMessage.classList.add('hidden');
+                            denunciaSuccessMessage.classList.remove('hidden');
+                            denunciaForm.reset();
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            denunciaSuccessMessage.classList.add('hidden');
+                            denunciaErrorMessage.textContent = data.error || 'Erro ao enviar a denúncia.';
+                            denunciaErrorMessage.classList.remove('hidden');
+                        }
+                    })
+                    .catch(error => {
+                        denunciaSuccessMessage.classList.add('hidden');
+                        denunciaErrorMessage.textContent = 'Erro de conexão.';
+                        denunciaErrorMessage.classList.remove('hidden');
+                        console.error('Error submitting denuncia:', error);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

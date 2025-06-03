@@ -147,7 +147,7 @@
             <h3 class="section-title text-lg font-semibold">Denúncias Enviadas</h3>
             <ul>
                 {% for denuncia in denuncias %}
-                    <li class="list-item">{{ denuncia.titulo }} ({{ denuncia.data_criacao }})</li>
+                    <li class="list-item">{{ denuncia.descricao }}</li>
                 {% empty %}
                     <li>Nenhuma denúncia enviada.</li>
                 {% endfor %}
@@ -156,7 +156,7 @@
             <h3 class="section-title mt-4 text-lg font-semibold">Eventos Participados</h3>
             <ul>
                 {% for evento in eventos %}
-                    <li class="list-item">{{ evento.nome }} ({{ evento.data_inicio }})</li>
+                    <li class="list-item">{{ evento.titulo }} ({{ evento.data }})</li>
                 {% empty %}
                     <li>Nenhum evento participado.</li>
                 {% endfor %}
@@ -165,18 +165,9 @@
             <h3 class="section-title mt-4 text-lg font-semibold">Comentários Feitos</h3>
             <ul>
                 {% for comentario in comentarios %}
-                    <li class="list-item">{{ comentario.texto|truncatechars:50 }} ({{ comentario.data_criacao }})</li>
+                    <li class="list-item">{{ comentario.texto|truncatechars:50 }} ({{ comentario.data }})</li>
                 {% empty %}
                     <li>Nenhum comentário feito.</li>
-                {% endfor %}
-            </ul>
-
-            <h3 class="section-title mt-4 text-lg font-semibold">Feedbacks Enviados</h3>
-            <ul>
-                {% for feedback in feedbacks %}
-                    <li class="list-item">{{ feedback.mensagem|truncatechars:50 }} ({{ feedback.data_criacao }})</li>
-                {% empty %}
-                    <li>Nenhum feedback enviado.</li>
                 {% endfor %}
             </ul>
 

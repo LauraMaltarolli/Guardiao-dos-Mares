@@ -1,0 +1,298 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA;
+            color: #343A40;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+<header class="navbar">
+    <div class="container">
+        <div class="logo">
+            🌊 <span>Guardião dos Mares</span>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="{% url 'index' %}">Início</a></li>
+                <li><a href="{% url 'ataque' %}">Ataques</a></li>
+                <li><a href="{% url 'tubarao' %}">Tubarões</a></li>
+                <li><a href="{% url 'campanha' %}">Campanhas</a></li>
+                <li><a href="{% url 'denuncia' %}">Denúncias</a></li>
+                <li><a href="{% url 'evento' %}">Eventos</a></li>
+                <li><a href="{% url 'perfil' %}">Perfil</a></li>
+                <li><a href="{% url 'logout' %}">Sair</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="introduction" class="mb-12 text-center max-w-3xl mx-auto">
+            <h2 class="text-2xl font-bold mb-4 text-blue-600">Encontre um Evento</h2>
+            <p class="text-gray-600 mb-6">
+                Confira a lista de eventos programados. Clique em cada evento para ver mais detalhes e informações sobre como participar.
+            </p>
+            {% if pode_criar_evento %}
+                <button id="open-create-event-modal-btn" class="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition-colors">Criar Evento</button>
+            {% endif %}
+        </section>
+
+        <section id="event-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <form id="csrf-form" style="display: none;">
+                {% csrf_token %}
+            </form>
+            {% for evento in eventos %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-blue-700 mb-2">{{ evento.titulo }}</h3>
+                        <p class="text-gray-600 text-sm mb-3">Data: {{ evento.data|date:"d/m/Y" }}</p>
+                        <p class="text-gray-600 text-sm mb-3">Local: {{ evento.local }}</p>
+                        <p class="text-gray-700 text-sm mb-4">{{ evento.descricao|truncatechars:150 }}</p>
+                        <div class="flex items-center justify-between mt-4">
+                            <button class="participate-btn bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-3 rounded-md text-sm transition-colors" data-evento-id="{{ evento.id }}">
+                                {% if user.is_authenticated and user in evento.participantes.all %}
+                                    Sair
+                                {% else %}
+                                    Participar
+                                {% endif %}
+                            </button>
+                            <button class="view-participants-btn text-blue-500 hover:text-blue-700 text-sm font-semibold" data-evento-id="{{ evento.id }}">
+                                Participantes ({{ evento.participantes.count }})
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center text-gray-500 col-span-full">Nenhum evento programado no momento.</p>
+            {% endfor %}
+        </section>
+
+    </main>
+    <div id="create-event-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+            <button id="close-create-event-modal-btn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            <h2 class="text-2xl font-bold mb-4 text-green-700 text-center">Criar Novo Evento</h2>
+            {% if pode_criar_evento %}
+                <form id="create-event-form" method="post">
+                    {% csrf_token %}
+                    {% for field in create_event_form %}
+                        <div class="mb-4">
+                            <label for="{{ field.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <p class="text-red-500 text-xs italic">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+                            {% if field.help_text %}
+                                <p class="text-gray-500 text-xs italic">{{ field.help_text }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">Criar Evento</button>
+                    <div id="create-event-error-message" class="text-red-500 text-sm mt-2 hidden"></div>
+                    <div id="create-event-success-message" class="text-green-500 text-sm mt-2 hidden">Evento criado com sucesso!</div>
+                </form>
+            {% else %}
+                <p class="text-center text-gray-600 py-4">Apenas pesquisadores e organizações podem criar eventos.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="participants-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+            <button id="close-participants-modal-btn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            <h2 id="participants-modal-title" class="text-2xl font-bold mb-4 text-blue-700 text-center">Participantes</h2>
+            <ul id="participants-list" class="space-y-2">
+                </ul>
+            <div id="no-participants-message" class="text-gray-500 text-center hidden">Ninguém participando ainda.</div>
+        </div>
+    </div>
+
+<footer class="footer">
+    <p>© 2025 Guardião dos Mares. Todos os direitos reservados.</p>
+</footer>
+
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openCreateEventModalBtn = document.getElementById('open-create-event-modal-btn');
+            const createEventModal = document.getElementById('create-event-modal');
+            const closeCreateEventModalBtn = document.getElementById('close-create-event-modal-btn');
+            const createEventForm = document.getElementById('create-event-form');
+            const createEventErrorMessage = document.getElementById('create-event-error-message');
+            const createEventSuccessMessage = document.getElementById('create-event-success-message');
+
+            const participateButtons = document.querySelectorAll('.participate-btn');
+            const viewParticipantsButtons = document.querySelectorAll('.view-participants-btn');
+            const participantsModal = document.getElementById('participants-modal');
+            const closeParticipantsModalBtn = document.getElementById('close-participants-modal-btn');
+            const participantsList = document.getElementById('participants-list');
+            const noParticipantsMessage = document.getElementById('no-participants-message');
+            const participantsModalTitle = document.getElementById('participants-modal-title');
+
+            // Abrir modal de criação de evento
+            if (openCreateEventModalBtn) {
+                openCreateEventModalBtn.addEventListener('click', () => {
+                    createEventModal.classList.remove('hidden');
+                });
+            }
+
+            // Fechar modal de criação de evento
+            if (closeCreateEventModalBtn) {
+                closeCreateEventModalBtn.addEventListener('click', () => {
+                    createEventModal.classList.add('hidden');
+                    if (createEventForm) createEventForm.reset();
+                    if (createEventErrorMessage) createEventErrorMessage.classList.add('hidden');
+                    if (createEventSuccessMessage) createEventSuccessMessage.classList.add('hidden');
+                });
+            }
+
+            if (createEventModal) {
+                createEventModal.addEventListener('click', (event) => {
+                    if (event.target === createEventModal) {
+                        createEventModal.classList.add('hidden');
+                        if (createEventForm) createEventForm.reset();
+                        if (createEventErrorMessage) createEventErrorMessage.classList.add('hidden');
+                        if (createEventSuccessMessage) createEventSuccessMessage.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Enviar formulário de criação de evento via AJAX
+            if (createEventForm) {
+                createEventForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(this);
+
+                    fetch('/eventos/', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            createEventErrorMessage.classList.add('hidden');
+                            createEventSuccessMessage.classList.remove('hidden');
+                            createEventForm.reset();
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            createEventSuccessMessage.classList.add('hidden');
+                            createEventErrorMessage.textContent = data.error || 'Erro ao criar o evento.';
+                            createEventErrorMessage.classList.remove('hidden');
+                        }
+                    })
+                    .catch(error => {
+                        createEventSuccessMessage.classList.add('hidden');
+                        createEventErrorMessage.textContent = 'Erro de conexão ao criar o evento.';
+                        createEventErrorMessage.classList.remove('hidden');
+                        console.error('Erro ao criar evento:', error);
+                    });
+                });
+            }
+
+            // Participar/Sair de um evento
+            participateButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const eventoId = this.dataset.eventoId;
+                    const action = this.textContent.trim() === 'Participar' ? 'participar' : 'sair';
+
+                    fetch(`/eventos/${eventoId}/${action}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.textContent = action === 'participar' ? 'Sair' : 'Participar';
+                            const participantsCountButton = document.querySelector(`.view-participants-btn[data-evento-id="${eventoId}"]`);
+                            if (participantsCountButton) {
+                                participantsCountButton.textContent = `Participantes (${data.participantes_count})`;
+                            }
+                        } else {
+                            alert(data.error || 'Erro ao participar/sair do evento.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao participar/sair do evento:', error);
+                        alert('Erro de conexão.');
+                    });
+                });
+            });
+
+            // Ver lista de participantes
+            viewParticipantsButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const eventoId = this.dataset.eventoId;
+                    participantsModalTitle.textContent = `Participantes do Evento ${eventoId}`;
+                    participantsList.innerHTML = '';
+                    noParticipantsMessage.classList.add('hidden');
+                    participantsModal.classList.remove('hidden');
+
+                    fetch(`/eventos/${eventoId}/participantes/`, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.participantes.length > 0) {
+                            data.participantes.forEach(participante => {
+                                const li = document.createElement('li');
+                                li.textContent = participante.username;
+                                participantsList.appendChild(li);
+                            });
+                        } else {
+                            noParticipantsMessage.classList.remove('hidden');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao carregar participantes:', error);
+                        alert('Erro de conexão ao carregar participantes.');
+                    });
+                });
+            });
+
+            // Fechar modal de participantes
+            closeParticipantsModalBtn.addEventListener('click', () => {
+                participantsModal.classList.add('hidden');
+                participantsList.innerHTML = '';
+                noParticipantsMessage.classList.add('hidden');
+            });
+
+            participantsModal.addEventListener('click', (event) => {
+                if (event.target === participantsModal) {
+                    participantsModal.classList.add('hidden');
+                    participantsList.innerHTML = '';
+                    noParticipantsMessage.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

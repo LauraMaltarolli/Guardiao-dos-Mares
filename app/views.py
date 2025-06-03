@@ -5,6 +5,10 @@ from .models import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from django.utils import timezone
+from .forms import DenunciaForm, EventoForm
+from django.urls import reverse_lazy
 
 # Create your views here.
 # Index
@@ -50,7 +54,18 @@ class LoginView(View):
 
         if user is not None:
             login(request, user)
-            return redirect('index')  # Redireciona para a página inicial
+            # Buscar e armazenar a instância específica do usuário na sessão
+            try:
+                pesquisador = Pesquisador.objects.get(id=user.id)
+                request.session['user_type'] = 'pesquisador'
+            except Pesquisador.DoesNotExist:
+                try:
+                    organizacao = Organizacao.objects.get(id=user.id)
+                    request.session['user_type'] = 'organizacao'
+                except Organizacao.DoesNotExist:
+                    request.session['user_type'] = 'usuario' # Ou outra identificação
+
+            return redirect('index')
         else:
             messages.error(request, 'Usuario ou senha inválidos')
             return render(request, 'login.html')
@@ -176,7 +191,6 @@ class PerfilView(LoginRequiredMixin, View):
         denuncias = Denuncia.objects.filter(usuario=usuario)
         eventos = Evento.objects.filter(participantes=usuario)
         comentarios = Comentario.objects.filter(usuario=usuario)
-        feedbacks = Feedback.objects.filter(usuario=usuario)
 
         # Verificar o tipo de usuário
         tipo_usuario = "Usuário"
@@ -204,7 +218,6 @@ class PerfilView(LoginRequiredMixin, View):
             'denuncias': denuncias,
             'eventos': eventos,
             'comentarios': comentarios,
-            'feedbacks': feedbacks,
             'campanhas': campanhas,
         }
 
@@ -234,17 +247,82 @@ class AtaquesView(LoginRequiredMixin, View):
     def post(self, request):
         pass
 
+
 # Evento
 class EventoView(LoginRequiredMixin, View):
     login_url = 'login'
 
     def get(self, request, *args, **kwargs):
+        print(f"Na EventoView - Usuário logado: {request.user.username}, Tipo: {type(request.user)}")
+        pode_criar_evento = False
+        if request.user.is_authenticated:
+            user_type = request.session.get('user_type')
+            if user_type == 'pesquisador' or user_type == 'organizacao':
+                pode_criar_evento = True
+                print(f"Na EventoView - Tipo de usuário da sessão: {user_type}")
+            else:
+                print(f"Na EventoView - Tipo de usuário da sessão: {user_type}")
         eventos = Evento.objects.all()
-        return render(request, 'evento.html', {'eventos': eventos})
+        create_event_form = EventoForm()
+        return render(request, 'evento.html', {'eventos': eventos, 'create_event_form': create_event_form, 'pode_criar_evento': pode_criar_evento})
 
-    def post(self, request):
-        pass
+    def post(self, request, *args, **kwargs):
+        form = EventoForm(request.POST)
+        if form.is_valid():
+            evento = form.save(commit=False)
+            evento.save() 
 
+            if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            else:
+                return redirect('lista_eventos')
+        else:
+            eventos = Evento.objects.all()
+            if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': form.errors.as_json()})
+            else:
+                return render(request, 'evento.html', {'eventos': eventos, 'create_event_form': form})
+
+
+class ParticiparEventoView(LoginRequiredMixin, View):
+    def post(self, request, evento_id):
+        print(f"ParticiparEventoView acionada para evento_id: {evento_id}, usuário: {request.user.username}")
+        if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+            evento = get_object_or_404(Evento, id=evento_id)
+            print(f"Evento encontrado: {evento.titulo}")
+            if request.user not in evento.participantes.all():
+                print(f"Usuário {request.user.username} não está participando, adicionando...")
+                evento.participantes.add(request.user)
+                print(f"Participantes agora: {evento.participantes.count()}")
+                return JsonResponse({'success': True, 'participantes_count': evento.participantes.count()})
+            else:
+                print(f"Usuário {request.user.username} já está participando.")
+                return JsonResponse({'success': False, 'error': 'Você já está participando deste evento.'})
+        else:
+            print("Requisição inválida (não AJAX).")
+            return JsonResponse({'success': False, 'error': 'Requisição inválida.'}, status=400)
+
+class SairEventoView(LoginRequiredMixin, View):
+    def post(self, request, evento_id):
+        if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+            evento = get_object_or_404(Evento, id=evento_id)
+            if request.user in evento.participantes.all():
+                evento.participantes.remove(request.user)
+                return JsonResponse({'success': True, 'participantes_count': evento.participantes.count()})
+            else:
+                return JsonResponse({'success': False, 'error': 'Você não está participando deste evento.'})
+        return JsonResponse({'success': False, 'error': 'Requisição inválida.'}, status=400)
+    
+class ListarParticipantesView(LoginRequiredMixin, View):
+    def get(self, request, evento_id):
+        if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+            evento = get_object_or_404(Evento, id=evento_id)
+            participantes = evento.participantes.values('username').all()
+            participantes_list = list(participantes)
+            return JsonResponse({'success': True, 'participantes': participantes_list})
+        return JsonResponse({'success': False, 'error': 'Requisição inválida.'}, status=400)
+
+listar_participantes = ListarParticipantesView.as_view()
 
 # Tubarões
 class TubaraoView(LoginRequiredMixin, View):
@@ -257,18 +335,33 @@ class TubaraoView(LoginRequiredMixin, View):
     def post(self, request):
         pass
 
-
-# Denúncias
-class DenunciaView(LoginRequiredMixin, View):
+# Denúncia
+class CriarDenunciaView(LoginRequiredMixin, View):
     login_url = 'login'
+    form_class = DenunciaForm 
+    success_url = reverse_lazy('lista_denuncias')
 
     def get(self, request, *args, **kwargs):
+        form = self.form_class()
         denuncias = Denuncia.objects.all()
-        return render(request, 'denuncia.html', {'denuncias': denuncias})
+        return render(request, 'denuncia.html', {'form': form, 'denuncias': denuncias})
 
-    def post(self, request):
-        pass
-
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES)
+        if form.is_valid():
+            denuncia = form.save(commit=False)
+            denuncia.usuario = request.user
+            denuncia.save()
+            if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            else:
+                return redirect(self.success_url)
+        else:
+            denuncias = Denuncia.objects.all()
+            if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': form.errors.as_json()})
+            else:
+                return render(request, 'denuncia.html', {'form': form, 'denuncias': denuncias})
 
 # Comentários
 class ComentarioView(LoginRequiredMixin, View):
@@ -282,13 +375,27 @@ class ComentarioView(LoginRequiredMixin, View):
         pass
 
 
-# Feedbacks
-class FeedbackView(LoginRequiredMixin, View):
+class ComentarCampanhaView(LoginRequiredMixin, View):
     login_url = 'login'
 
-    def get(self, request, *args, **kwargs):
-        feedbacks = Feedback.objects.all()
-        return render(request, 'feedback.html', {'feedbacks': feedbacks})
+    def post(self, request, campanha_id):
+        campanha = get_object_or_404(Campanha, id=campanha_id)
+        texto = request.POST.get('texto')
 
-    def post(self, request):
-        pass
+        if texto:
+            comentario = Comentario.objects.create(
+                campanha=campanha,
+                usuario=request.user,
+                texto=texto,
+                data=timezone.now().date() # Or timezone.now() if you want datetime
+            )
+            return JsonResponse({
+                'success': True,
+                'comentario': {
+                    'texto': comentario.texto,
+                    'data': comentario.data.strftime('%d/%m/%Y'),
+                    'usuario': comentario.usuario.username
+                }
+            })
+        else:
+            return JsonResponse({'success': False, 'error': 'O comentário não pode estar vazio.'})

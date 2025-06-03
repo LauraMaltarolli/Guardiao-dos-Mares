@@ -30,9 +30,12 @@ urlpatterns = [
     path('ataque/', AtaquesView.as_view(), name='ataque'),
     path('campanhas/', CampanhaView.as_view(), name='campanha'),
     path('eventos/', EventoView.as_view(), name='evento'),
+    path('eventos/<int:evento_id>/participar/', ParticiparEventoView.as_view(), name='participar_evento'),
+    path('eventos/<int:evento_id>/sair/', SairEventoView.as_view(), name='sair_evento'),
+    path('eventos/<int:evento_id>/participantes/', listar_participantes, name='listar_participantes'),
     path('tubaroes/', TubaraoView.as_view(), name='tubarao'),
-    path('denuncias/', DenunciaView.as_view(), name='denuncia'),
+    path('denuncias/', CriarDenunciaView.as_view(), name='denuncia'),
     path('comentarios/', ComentarioView.as_view(), name='comentario'),
-    path('feedbacks/', FeedbackView.as_view(), name='feedback'),
+    path('campanhas/<int:campanha_id>/comentar/', ComentarCampanhaView.as_view(), name='comentar_campanha'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

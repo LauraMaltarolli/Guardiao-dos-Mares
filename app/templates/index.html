@@ -35,6 +35,7 @@
         <h2>📢 Campanhas Ativas</h2>
         <div class="grid">
             {% for campanha in campanhas_ativas %}
+            <a href="{% url 'campanha' %}">
                 <div class="card">
                     <h3>{{ campanha.titulo }}</h3>
                     <p>{{ campanha.descricao|truncatechars:100 }}</p>
@@ -44,6 +45,7 @@
             {% empty %}
                 <p>Nenhuma campanha ativa no momento.</p>
             {% endfor %}
+            </a>
         </div>
     </section>
 
@@ -51,6 +53,7 @@
         <h2>🦈 Tubarões Ameaçados</h2>
         <div class="grid">
             {% for tubarao in tubaroes_ameacados %}
+            <a href="{% url 'tubarao' %}">
                 <div class="card">
                     <img src="{{ tubarao.imagem.url }}" alt="{{ tubarao.nome_comum }}">
                     <h3>{{ tubarao.nome_comum }}</h3>
@@ -60,6 +63,7 @@
             {% empty %}
                 <p>Nenhum tubarão ameaçado cadastrado.</p>
             {% endfor %}
+            </a>
         </div>
     </section>
 
@@ -67,6 +71,7 @@
         <h2>🚩 Denúncias Recentes</h2>
         <div class="grid">
             {% for denuncia in denuncias_recentes %}
+            <a href="{% url 'denuncia' %}">
                 <div class="card">
                     <img src="{{ denuncia.imagem.url }}" alt="Imagem da denúncia">
                     <h3>Local: {{ denuncia.local }}</h3>
@@ -76,6 +81,7 @@
             {% empty %}
                 <p>Nenhuma denúncia recente.</p>
             {% endfor %}
+            </a>
         </div>
     </section>
 
@@ -83,6 +89,7 @@
         <h2>📅 Próximos Eventos</h2>
         <div class="grid">
             {% for evento in proximos_eventos %}
+            <a href="{% url 'evento' %}">
                 <div class="card">
                     <h3>{{ evento.titulo }}</h3>
                     <p>{{ evento.descricao|truncatechars:100 }}</p>
@@ -92,6 +99,7 @@
             {% empty %}
                 <p>Nenhum evento futuro cadastrado.</p>
             {% endfor %}
+            </a>
         </div>
     </section>
 
